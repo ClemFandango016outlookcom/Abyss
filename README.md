@@ -1,82 +1,65 @@
 # **Abyss**
-
 𝗧𝗵𝗲 𝗕𝗲𝘀𝘁 𝗠𝗶𝗻𝗲𝗰𝗿𝗮𝗳𝘁 𝗖𝗹𝗶𝗲𝗻𝘁 𝘆𝗼𝘂 𝗰𝗼𝘂𝗹𝗱 𝗲𝘃𝗲𝗿 𝘄𝗮𝗻𝘁
 
 𝗜𝗻𝗰𝗹𝘂𝗱𝗲𝘀 𝗺𝗼𝗱𝘀, 𝘀𝗲𝗹𝗳-𝗵𝗼𝘀𝘁𝗲𝗱 𝘀𝗲𝗿𝘃𝗲𝗿𝘀 𝗮𝗻𝗱 𝗠𝗶𝗻𝗲𝗰𝗿𝗮𝗳𝘁 𝗹𝗮𝘂𝗻𝗰𝗵𝗶𝗻𝗴!
 
-> 🌀 A modern **Minecraft launcher + mod browser** for the desktop — think Modrinth App, reimagined.
-Browse and install mods from Modrinth, manage multiple game instances with different versions and
-mod loaders, sign in with your Microsoft account, and launch the game. Built with Electron, React
-and TypeScript.
+Abyss is a desktop Minecraft launcher with a Modrinth mod browser built in. You can search for
+mods and drop them straight into an instance, keep separate instances on different versions and
+loaders, sign in with your Microsoft account and launch the game. It's an Electron app written in
+React and TypeScript.
 
-![status](https://img.shields.io/badge/status-v0.1.0%20alpha-6c5ce7) ![platform](https://img.shields.io/badge/platform-win%20%7C%20mac%20%7C%20linux-00d2c6)
+## What works so far
 
-## ✨ Features
+- Launching vanilla, Fabric and Quilt. Forge and NeoForge are in the UI but not hooked up yet.
+- Microsoft login (via msmc). The session refreshes itself so you only sign in once.
+- Searching Modrinth for mods, modpacks, resource packs and shaders, and installing into an instance.
+- Making and deleting instances, setting how much RAM each one gets, turning mods on/off or removing them.
+- A friends list. It's stored on your machine for now, there's no server behind it.
 
-- **🎮 Launch Minecraft** — vanilla, **Fabric** and **Quilt** (Forge/NeoForge coming soon), any
-  version from the official manifest, with per-instance memory allocation.
-- **🔐 Microsoft sign-in** — real Xbox/Minecraft authentication via `msmc`; sessions are refreshed
-  automatically so you only log in once.
-- **🧩 Mod browser** — search the entire Modrinth catalogue (mods, modpacks, resource packs,
-  shaders), filter by loader/version, and one-click install into any instance.
-- **📦 Instance management** — create, rename, delete instances; enable/disable individual mods;
-  open the instance folder; isolated mods/saves per instance with a shared asset cache.
-- **👥 Friends** — keep a friends list with statuses (local-first; see roadmap).
-- **🎨 Theming** — Abyss, Midnight and Void colour themes; custom frameless window.
+## Running it
 
-## 🚀 Getting started
+You need Node 18+, a Java runtime (21 works fine) and a Microsoft account that owns Java Edition.
 
-Requirements: **Node.js 18+**, **Java** (17+ for modern Minecraft — Java 21 recommended), and a
-**Microsoft account that owns Minecraft: Java Edition**.
-
-```bash
+```
 npm install
-npm run dev      # launch in development with hot reload
+npm run dev
 ```
 
-Build / package a distributable:
+The first launch pulls down the game files so it takes a minute.
 
-```bash
-npm run build    # type-check-free bundle into ./out
-npm run dist     # build installers into ./release (Windows nsis / mac dmg / linux AppImage)
-```
-
-## 🏗️ Architecture
+To build the Windows installer:
 
 ```
-src/
-├── shared/        Types + IPC channel contract shared across processes
-├── main/          Electron main process
-│   ├── index.ts   Window + app lifecycle
-│   ├── ipc.ts     IPC handlers (the bridge between UI and capabilities)
-│   ├── auth.ts    Microsoft / Xbox / Minecraft auth (msmc)
-│   ├── minecraft.ts  Version manifest, loader install, launch (minecraft-launcher-core)
-│   ├── modrinth.ts   Modrinth API v2 client
-│   ├── instances.ts  Instance + mod file management
-│   ├── friends.ts    Local friends store
-│   └── store.ts   Persistent config (electron-store)
-├── preload/       Secure contextBridge exposing `window.abyss`
-└── renderer/      React UI (pages: Play, Browse, ModDetail, InstanceDetail, Friends, Settings)
+npm run dist
 ```
 
-The renderer never touches Node or the network directly — every privileged action goes through a
-typed IPC surface defined in `src/shared/ipc.ts` and exposed via the preload bridge.
+That puts `Abyss-0.1.0-setup.exe` and the unpacked app in `release/`.
 
-## 🗺️ Roadmap
+## How it's put together
 
-- [ ] Forge & NeoForge installer support
-- [ ] Modrinth modpack one-click install (`.mrpack`)
-- [ ] Automatic mod dependency resolution
-- [ ] Real social backend for live friend presence & invites
-- [ ] Mod update checks
-- [ ] Custom Java runtime download per Minecraft version
+```
+src/main      main process - auth, launching, the Modrinth client, saved data
+src/preload   the bridge that hands a small typed API to the UI
+src/renderer  the React front end
+src/shared    types and the list of IPC channels used by both sides
+```
 
-## ⚖️ Notes & credits
+The UI never touches the network or the disk directly. It all goes through the IPC handlers in
+`src/main/ipc.ts`.
 
-- Mod content and metadata are provided by **[Modrinth](https://modrinth.com)** via their public
-  API. Abyss is an unofficial client and is not affiliated with Modrinth or Mojang/Microsoft.
-- Minecraft is a trademark of Mojang Studios. You must own a legitimate copy to play.
+## Still on the list
 
-## 📄 License
+- Forge and NeoForge support
+- One-click modpack (.mrpack) installs
+- Working out mod dependencies automatically
+- An actual backend so the friends list does something
+- Checking installed mods for updates
+
+## Credits
+
+Mod data comes from [Modrinth](https://modrinth.com) and their public API. This isn't affiliated
+with Modrinth or Mojang, and you need to own Minecraft to play.
+
+## License
 
 MIT
