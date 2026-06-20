@@ -1,4 +1,4 @@
-# Abyss
-The Best Minecraft Client you could ever want
+# **Abyss**
+𝗧𝗵𝗲 𝗕𝗲𝘀𝘁 𝗠𝗶𝗻𝗲𝗰𝗿𝗮𝗳𝘁 𝗖𝗹𝗶𝗲𝗻𝘁 𝘆𝗼𝘂 𝗰𝗼𝘂𝗹𝗱 𝗲𝘃𝗲𝗿 𝘄𝗮𝗻𝘁
 
-Includes mods, self-hosted servers and Minecraft launching!
+𝗜𝗻𝗰𝗹𝘂𝗱𝗲𝘀 𝗺𝗼𝗱𝘀, 𝘀𝗲𝗹𝗳-𝗵𝗼𝘀𝘁𝗲𝗱 𝘀𝗲𝗿𝘃𝗲𝗿𝘀 𝗮𝗻𝗱 𝗠𝗶𝗻𝗲𝗰𝗿𝗮𝗳𝘁 𝗹𝗮𝘂𝗻𝗰𝗵𝗶𝗻𝗴!
