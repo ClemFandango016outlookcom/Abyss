@@ -18,6 +18,7 @@ export function ModDetail(): JSX.Element {
   const [versionId, setVersionId] = useState('')
   const [installing, setInstalling] = useState(false)
   const [installed, setInstalled] = useState(false)
+  const [depCount, setDepCount] = useState(0)
 
   const isModpack = project?.project_type === 'modpack'
   const selectedInstance = instances.find((i) => i.id === instanceId)
@@ -58,7 +59,11 @@ export function ModDetail(): JSX.Element {
     if (!version) return
     setInstalling(true)
     setError('')
-    const meta = { title: project.title, iconUrl: project.icon_url ?? undefined }
+    const meta = {
+      title: project.title,
+      iconUrl: project.icon_url ?? undefined,
+      projectType: project.project_type
+    }
     try {
       if (isModpack) {
         const instance = await window.abyss.mods.installModpack(version, meta)
@@ -67,9 +72,10 @@ export function ModDetail(): JSX.Element {
         return
       }
       if (!selectedInstance) return
-      await window.abyss.mods.install(selectedInstance.id, version, meta)
+      const added = await window.abyss.mods.install(selectedInstance.id, version, meta)
       await refreshInstances()
       setInstalled(true)
+      setDepCount(Math.max(0, added.length - 1))
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Install failed')
     } finally {
@@ -243,6 +249,11 @@ export function ModDetail(): JSX.Element {
                 )}
                 {installed ? 'Installed' : 'Install'}
               </button>
+              {installed && depCount > 0 && (
+                <p className="muted" style={{ marginTop: 10 }}>
+                  Also pulled in {depCount} required {depCount === 1 ? 'dependency' : 'dependencies'}.
+                </p>
+              )}
               {selectedInstance && versions.length === 0 && (
                 <p className="muted" style={{ marginTop: 10 }}>
                   No files match {selectedInstance.mcVersion} · {selectedInstance.loader}.

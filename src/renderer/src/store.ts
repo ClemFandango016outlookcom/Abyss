@@ -5,6 +5,7 @@ import type {
   CreateInstanceInput,
   Friend,
   GameInstance,
+  GameLogLine,
   LaunchStatus
 } from '../../shared/types'
 
@@ -15,6 +16,7 @@ interface AppState {
   instances: GameInstance[]
   friends: Friend[]
   launchStatus: Record<string, LaunchStatus>
+  logs: Record<string, GameLogLine[]>
 
   init: () => Promise<void>
 
@@ -31,6 +33,7 @@ interface AppState {
   launch: (id: string) => Promise<void>
   kill: (id: string) => Promise<void>
   clearLaunchStatus: (id: string) => void
+  clearLogs: (id: string) => void
 
   // friends
   refreshFriends: () => Promise<void>
@@ -49,6 +52,7 @@ export const useStore = create<AppState>((set, get) => ({
   instances: [],
   friends: [],
   launchStatus: {},
+  logs: {},
 
   init: async () => {
     const [settings, accounts, instances, friends] = await Promise.all([
@@ -59,6 +63,12 @@ export const useStore = create<AppState>((set, get) => ({
     ])
     window.abyss.onLaunchStatus((status) => {
       set((s) => ({ launchStatus: { ...s.launchStatus, [status.instanceId]: status } }))
+    })
+    window.abyss.onGameLog((log) => {
+      set((s) => {
+        const existing = s.logs[log.instanceId] ?? []
+        return { logs: { ...s.logs, [log.instanceId]: [...existing, log].slice(-600) } }
+      })
     })
     set({ settings, accounts, instances, friends, ready: true })
   },
@@ -93,6 +103,12 @@ export const useStore = create<AppState>((set, get) => ({
       const next = { ...s.launchStatus }
       delete next[id]
       return { launchStatus: next }
+    }),
+  clearLogs: (id) =>
+    set((s) => {
+      const next = { ...s.logs }
+      delete next[id]
+      return { logs: next }
     }),
 
   refreshFriends: async () => set({ friends: await window.abyss.friends.list() }),

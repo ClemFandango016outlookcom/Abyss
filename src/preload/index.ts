@@ -6,6 +6,7 @@ import type {
   CreateInstanceInput,
   Friend,
   GameInstance,
+  GameLogLine,
   InstalledMod,
   LaunchStatus,
   Loader,
@@ -13,6 +14,7 @@ import type {
   ModrinthProject,
   ModrinthSearchResponse,
   ModrinthVersion,
+  ModUpdate,
   SearchParams
 } from '../shared/types'
 
@@ -53,6 +55,7 @@ const api = {
     update: (id: string, patch: Partial<GameInstance>) =>
       invoke<GameInstance | null>(IPC.instanceUpdate, id, patch),
     remove: (id: string) => invoke<void>(IPC.instanceDelete, id),
+    duplicate: (id: string) => invoke<GameInstance | null>(IPC.instanceDuplicate, id),
     openFolder: (id: string) => invoke<void>(IPC.instanceOpenFolder, id),
     launch: (id: string) => invoke<boolean>(IPC.instanceLaunch, id),
     kill: (id: string) => invoke<boolean>(IPC.instanceKill, id)
@@ -62,12 +65,18 @@ const api = {
     project: (idOrSlug: string) => invoke<ModrinthProject>(IPC.modrinthProject, idOrSlug),
     versions: (idOrSlug: string, loader?: Loader, gameVersion?: string) =>
       invoke<ModrinthVersion[]>(IPC.modrinthVersions, idOrSlug, loader, gameVersion),
-    install: (instanceId: string, version: ModrinthVersion, meta: { title: string; iconUrl?: string }) =>
-      invoke<InstalledMod>(IPC.modInstall, instanceId, version, meta),
+    install: (
+      instanceId: string,
+      version: ModrinthVersion,
+      meta: { title: string; iconUrl?: string; projectType?: string }
+    ) => invoke<InstalledMod[]>(IPC.modInstall, instanceId, version, meta),
     remove: (instanceId: string, projectId: string) =>
       invoke<void>(IPC.modRemove, instanceId, projectId),
     toggle: (instanceId: string, projectId: string, enabled: boolean) =>
       invoke<void>(IPC.modToggle, instanceId, projectId, enabled),
+    checkUpdates: (instanceId: string) => invoke<ModUpdate[]>(IPC.modUpdatesCheck, instanceId),
+    update: (instanceId: string, projectId: string) =>
+      invoke<InstalledMod | null>(IPC.modUpdate, instanceId, projectId),
     installModpack: (version: ModrinthVersion, meta: { title: string; iconUrl?: string }) =>
       invoke<GameInstance>(IPC.modpackInstall, version, meta)
   },
@@ -82,6 +91,12 @@ const api = {
     const listener = (_e: unknown, status: LaunchStatus): void => cb(status)
     ipcRenderer.on(IPC.launchStatus, listener)
     return () => ipcRenderer.removeListener(IPC.launchStatus, listener)
+  },
+  /** Subscribe to live game log lines. Returns an unsubscribe function. */
+  onGameLog: (cb: (line: GameLogLine) => void) => {
+    const listener = (_e: unknown, line: GameLogLine): void => cb(line)
+    ipcRenderer.on(IPC.gameLog, listener)
+    return () => ipcRenderer.removeListener(IPC.gameLog, listener)
   }
 }
 

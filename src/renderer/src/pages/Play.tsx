@@ -15,6 +15,9 @@ export function Play(): JSX.Element {
   const [showCreate, setShowCreate] = useState(false)
 
   const hasAccount = accounts.some((a) => a.active)
+  const sorted = [...instances].sort(
+    (a, b) => (b.lastPlayed ?? b.createdAt) - (a.lastPlayed ?? a.createdAt)
+  )
 
   const onLaunch = async (id: string): Promise<void> => {
     try {
@@ -62,7 +65,7 @@ export function Play(): JSX.Element {
         </div>
       ) : (
         <div className="instance-grid">
-          {instances.map((inst) => (
+          {sorted.map((inst) => (
             <div key={inst.id} className="instance-card card">
               <div className="head">
                 <div className="instance-icon">{inst.name.trim().charAt(0) || 'A'}</div>

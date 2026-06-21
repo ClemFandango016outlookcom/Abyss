@@ -29,6 +29,7 @@ export const IPC = {
   instanceUpdate: 'instance:update',
   instanceDelete: 'instance:delete',
   instanceOpenFolder: 'instance:openFolder',
+  instanceDuplicate: 'instance:duplicate',
 
   // mods (modrinth)
   modrinthSearch: 'modrinth:search',
@@ -37,7 +38,10 @@ export const IPC = {
   modInstall: 'mod:install',
   modRemove: 'mod:remove',
   modToggle: 'mod:toggle',
+  modUpdatesCheck: 'mod:updatesCheck',
+  modUpdate: 'mod:update',
   modpackInstall: 'modpack:install',
+  gameLog: 'game:log', // main -> renderer event
 
   // friends
   friendsList: 'friends:list',

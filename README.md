@@ -15,10 +15,14 @@ React and TypeScript.
 - Launching vanilla, Fabric and Quilt, plus NeoForge and Forge (experimental — they pull the
   official installer and run it on first launch, which can take a few minutes).
 - Microsoft login (via msmc). The session refreshes itself so you only sign in once.
-- Searching Modrinth for mods, modpacks, resource packs and shaders, and installing into an instance.
+- Searching Modrinth for mods, modpacks, resource packs and shaders. Installing a mod pulls in its
+  required dependencies automatically, and resource packs and shaders land in the right folders.
+- Checking installed mods for newer versions and updating them in a click — one at a time or all at once.
 - Installing a whole Modrinth modpack (.mrpack) in one click — Abyss creates a matching instance and
   downloads every mod and config file in the pack.
-- Making and deleting instances, setting how much RAM each one gets, turning mods on/off or removing them.
+- A live console that streams the game's log output, which helps when a Forge/NeoForge launch misbehaves.
+- Making, duplicating and deleting instances, setting how much RAM each one gets, turning content on/off
+  or removing it. Instances sort by most recently played.
 - A friends list. Usernames are checked against Mojang, so each friend is a real account with their
   real skin. Stored locally; there's no presence backend yet.
 
@@ -55,9 +59,9 @@ The UI never touches the network or the disk directly. It all goes through the I
 
 ## Still on the list
 
-- Working out mod dependencies automatically
 - An actual backend so the friends list shows live presence
-- Checking installed mods for updates
+- CurseForge modpack imports
+- A skin viewer for your account
 
 ## Credits
 

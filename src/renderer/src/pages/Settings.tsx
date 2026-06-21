@@ -132,7 +132,7 @@ export function SettingsPage(): JSX.Element | null {
       </div>
 
       <p className="muted mono" style={{ marginTop: 24 }}>
-        Abyss v0.4.0 · mods by Modrinth
+        Abyss v0.5.0 · mods by Modrinth
       </p>
     </div>
   )

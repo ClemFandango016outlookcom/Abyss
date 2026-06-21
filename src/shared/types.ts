@@ -22,6 +22,9 @@ export interface AbyssAccount {
   addedAt: number
 }
 
+/** Where a piece of Modrinth content lives inside an instance. */
+export type ContentKind = 'mod' | 'resourcepack' | 'shader'
+
 export interface InstalledMod {
   /** Modrinth project id */
   projectId: string
@@ -32,6 +35,24 @@ export interface InstalledMod {
   iconUrl?: string
   /** Whether the .jar is currently enabled (vs .jar.disabled) */
   enabled: boolean
+  /** Which folder it installs into (mods / resourcepacks / shaderpacks) */
+  kind?: ContentKind
+}
+
+export interface ModUpdate {
+  projectId: string
+  title: string
+  iconUrl?: string
+  currentVersionId: string
+  latestVersionId: string
+  latestVersionNumber: string
+}
+
+/** A line of output from a running game, streamed main -> renderer. */
+export interface GameLogLine {
+  instanceId: string
+  line: string
+  level: 'info' | 'debug'
 }
 
 export interface GameInstance {

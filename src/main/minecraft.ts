@@ -3,7 +3,7 @@ import { existsSync } from 'fs'
 import { join } from 'path'
 import { Client } from 'minecraft-launcher-core'
 import type { ChildProcess } from 'child_process'
-import type { GameInstance, Loader, LaunchStatus, McVersion } from '../shared/types'
+import type { GameInstance, GameLogLine, Loader, LaunchStatus, McVersion } from '../shared/types'
 import { getSettings } from './store'
 import { sharedRoot, instanceDir } from './paths'
 import type { LaunchUser } from './auth'
@@ -140,7 +140,8 @@ async function installLoaderProfile(
 export async function launchInstance(
   instance: GameInstance,
   user: LaunchUser,
-  emit: (status: LaunchStatus) => void
+  emit: (status: LaunchStatus) => void,
+  logEmit: (line: GameLogLine) => void = () => {}
 ): Promise<void> {
   const id = instance.id
   const settings = getSettings()
@@ -181,7 +182,13 @@ export async function launchInstance(
     status('downloading', `Downloading ${e.type}…`, pct)
   })
   client.on('download-status', () => status('downloading', 'Downloading game files…'))
-  client.on('data', () => status('running', 'Minecraft is running'))
+  client.on('data', (line: string) => {
+    status('running', 'Minecraft is running')
+    logEmit({ instanceId: id, line: String(line).replace(/\r?\n$/, ''), level: 'info' })
+  })
+  client.on('debug', (line: string) => {
+    logEmit({ instanceId: id, line: String(line).replace(/\r?\n$/, ''), level: 'debug' })
+  })
   client.on('close', (code: number) => {
     running.delete(id)
     status('closed', `Minecraft exited (code ${code})`)

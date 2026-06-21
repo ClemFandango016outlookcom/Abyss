@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron'
 import { IPC } from '../shared/ipc'
-import type { LaunchStatus } from '../shared/types'
+import type { GameLogLine, LaunchStatus } from '../shared/types'
 import { getSettings, updateSettings, getAccounts, setAccounts } from './store'
 import { loginInteractive, logout, getLaunchUser } from './auth'
 import { getVanillaVersions, getLoaderVersions, launchInstance, killInstance } from './minecraft'
@@ -10,10 +10,13 @@ import {
   createInstance,
   updateInstance,
   deleteInstance,
+  duplicateInstance,
   openInstanceFolder,
   installMod,
   removeMod,
-  toggleMod
+  toggleMod,
+  checkUpdates,
+  updateMod
 } from './instances'
 import { listFriends, addFriend, removeFriend, updateFriend } from './friends'
 import { installModpack } from './modpack'
@@ -83,10 +86,13 @@ export function registerIpc(getWindow: () => BrowserWindow | null): void {
     const emit = (s: LaunchStatus): void => {
       win?.webContents.send(IPC.launchStatus, s)
     }
+    const logEmit = (l: GameLogLine): void => {
+      win?.webContents.send(IPC.gameLog, l)
+    }
 
     emit({ instanceId, phase: 'authenticating', message: 'Refreshing session…' })
     const user = await getLaunchUser(account.uuid)
-    await launchInstance(instance, user, emit)
+    await launchInstance(instance, user, emit, logEmit)
     updateInstance(instanceId, { lastPlayed: Date.now() })
     if (getSettings().closeOnLaunch) win?.minimize()
     return true
@@ -98,6 +104,7 @@ export function registerIpc(getWindow: () => BrowserWindow | null): void {
   handle(IPC.instanceCreate, (input) => createInstance(input))
   handle(IPC.instanceUpdate, (id, patch) => updateInstance(id, patch))
   handle(IPC.instanceDelete, (id: string) => deleteInstance(id))
+  handle(IPC.instanceDuplicate, (id: string) => duplicateInstance(id))
   handle(IPC.instanceOpenFolder, (id: string) => openInstanceFolder(id))
 
   // ---- mods (modrinth) ----
@@ -111,6 +118,8 @@ export function registerIpc(getWindow: () => BrowserWindow | null): void {
   handle(IPC.modToggle, (instanceId, projectId, enabled) =>
     toggleMod(instanceId, projectId, enabled)
   )
+  handle(IPC.modUpdatesCheck, (instanceId: string) => checkUpdates(instanceId))
+  handle(IPC.modUpdate, (instanceId, projectId) => updateMod(instanceId, projectId))
   handle(IPC.modpackInstall, (version, meta) => {
     const win = getWindow()
     return installModpack(version, meta, (s) => win?.webContents.send(IPC.launchStatus, s))

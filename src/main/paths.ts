@@ -1,4 +1,5 @@
 import { join } from 'path'
+import type { ContentKind } from '../shared/types'
 import { getSettings } from './store'
 
 /** Shared install/cache root — versions, libraries and assets are de-duplicated here. */
@@ -13,4 +14,10 @@ export function instanceDir(id: string): string {
 
 export function instanceModsDir(id: string): string {
   return join(instanceDir(id), 'mods')
+}
+
+/** Resolves the install folder for a given content kind. */
+export function instanceContentDir(id: string, kind: ContentKind): string {
+  const sub = kind === 'resourcepack' ? 'resourcepacks' : kind === 'shader' ? 'shaderpacks' : 'mods'
+  return join(instanceDir(id), sub)
 }
