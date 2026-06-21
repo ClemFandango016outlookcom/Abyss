@@ -1,4 +1,5 @@
 import { mkdir, writeFile } from 'fs/promises'
+import { existsSync } from 'fs'
 import { join } from 'path'
 import { Client } from 'minecraft-launcher-core'
 import type { ChildProcess } from 'child_process'
@@ -10,6 +11,21 @@ import type { LaunchUser } from './auth'
 const MANIFEST = 'https://piston-meta.mojang.com/mc/game/version_manifest_v2.json'
 const FABRIC_META = 'https://meta.fabricmc.net/v2'
 const QUILT_META = 'https://meta.quiltmc.org/v3'
+const FORGE_META = 'https://maven.minecraftforge.net/net/minecraftforge/forge/maven-metadata.xml'
+const FORGE_BASE = 'https://maven.minecraftforge.net/net/minecraftforge/forge'
+const NEOFORGE_META = 'https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml'
+const NEOFORGE_BASE = 'https://maven.neoforged.net/releases/net/neoforged/neoforge'
+
+/** Maps a Minecraft version to the NeoForge version prefix (1.21.1 -> "21.1."). */
+function neoforgePrefix(mcVersion: string): string | null {
+  const parts = mcVersion.split('.')
+  if (parts[0] !== '1' || !parts[1]) return null
+  return `${parts[1]}.${parts[2] ?? '0'}.`
+}
+
+function xmlVersions(xml: string): string[] {
+  return [...xml.matchAll(/<version>([^<]+)<\/version>/g)].map((m) => m[1])
+}
 
 // Track running game processes so they can be killed.
 const running = new Map<string, ChildProcess>()
@@ -35,8 +51,55 @@ export async function getLoaderVersions(loader: Loader, mcVersion: string): Prom
     const arr = (await res.json()) as { loader: { version: string } }[]
     return arr.map((e) => e.loader.version)
   }
-  // forge / neoforge installers are not yet wired up.
+  if (loader === 'forge') {
+    const res = await fetch(FORGE_META)
+    if (!res.ok) return []
+    return xmlVersions(await res.text())
+      .filter((v) => v.startsWith(`${mcVersion}-`))
+      .map((v) => v.slice(mcVersion.length + 1))
+      .reverse()
+  }
+  if (loader === 'neoforge') {
+    const res = await fetch(NEOFORGE_META)
+    if (!res.ok) return []
+    const prefix = neoforgePrefix(mcVersion)
+    if (!prefix) return []
+    return xmlVersions(await res.text())
+      .filter((v) => v.startsWith(prefix))
+      .reverse()
+  }
   return []
+}
+
+/**
+ * Downloads a Forge/NeoForge installer jar (cached). The jar is handed to
+ * minecraft-launcher-core's `forge` option, which uses ForgeWrapper to run the
+ * installer's processors and launch the patched client.
+ */
+async function downloadForgeInstaller(
+  loader: Loader,
+  mcVersion: string,
+  loaderVersion: string
+): Promise<string> {
+  let url: string
+  let fileName: string
+  if (loader === 'forge') {
+    const full = `${mcVersion}-${loaderVersion}`
+    url = `${FORGE_BASE}/${full}/forge-${full}-installer.jar`
+    fileName = `forge-${full}-installer.jar`
+  } else {
+    url = `${NEOFORGE_BASE}/${loaderVersion}/neoforge-${loaderVersion}-installer.jar`
+    fileName = `neoforge-${loaderVersion}-installer.jar`
+  }
+  const dir = join(sharedRoot(), 'installers')
+  await mkdir(dir, { recursive: true })
+  const dest = join(dir, fileName)
+  if (!existsSync(dest)) {
+    const res = await fetch(url)
+    if (!res.ok) throw new Error(`Failed to download ${loader} installer (${res.status})`)
+    await writeFile(dest, Buffer.from(await res.arrayBuffer()))
+  }
+  return dest
 }
 
 /**
@@ -87,14 +150,25 @@ export async function launchInstance(
   status('preparing', 'Preparing launch…')
 
   let customVersion: string | null = null
+  let forgeInstaller: string | null = null
   if (instance.loader !== 'vanilla') {
     if (!instance.loaderVersion) throw new Error('No loader version selected for this instance.')
-    status('installing', `Installing ${instance.loader} ${instance.loaderVersion}…`)
-    customVersion = await installLoaderProfile(
-      instance.loader,
-      instance.mcVersion,
-      instance.loaderVersion
-    )
+    if (instance.loader === 'fabric' || instance.loader === 'quilt') {
+      status('installing', `Installing ${instance.loader} ${instance.loaderVersion}…`)
+      customVersion = await installLoaderProfile(
+        instance.loader,
+        instance.mcVersion,
+        instance.loaderVersion
+      )
+    } else {
+      status('installing', `Downloading ${instance.loader} installer…`)
+      forgeInstaller = await downloadForgeInstaller(
+        instance.loader,
+        instance.mcVersion,
+        instance.loaderVersion
+      )
+      status('installing', `Installing ${instance.loader} — the first launch can take a few minutes…`)
+    }
   }
 
   // Make sure the run directory exists.
@@ -123,6 +197,7 @@ export async function launchInstance(
       type: 'release',
       ...(customVersion ? { custom: customVersion } : {})
     },
+    ...(forgeInstaller ? { forge: forgeInstaller } : {}),
     memory: { max: `${instance.memoryMb}M`, min: '1024M' },
     overrides: {
       gameDirectory: instanceDir(id),

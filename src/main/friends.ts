@@ -2,18 +2,37 @@ import { randomUUID } from 'crypto'
 import type { Friend } from '../shared/types'
 import { getFriends, setFriends } from './store'
 
-// NOTE: Abyss has no central social backend yet, so the friends list is stored
-// locally on this machine. The data model + IPC surface are built so a real
-// presence service can be dropped in later without UI changes.
+// Friends are stored locally on this machine — there is no central Abyss social
+// backend yet, so live presence isn't synced. Usernames are validated against
+// Mojang's public API when added, so a friend reflects a real Minecraft account
+// (real UUID + skin) rather than arbitrary text.
+
+async function resolveMojang(name: string): Promise<{ id: string; name: string } | null> {
+  try {
+    const res = await fetch(
+      `https://api.mojang.com/users/profiles/minecraft/${encodeURIComponent(name)}`
+    )
+    if (res.status !== 200) return null
+    const json = (await res.json()) as { id?: string; name?: string }
+    if (!json.id || !json.name) return null
+    return { id: json.id, name: json.name }
+  } catch {
+    return null
+  }
+}
 
 export function listFriends(): Friend[] {
   return getFriends()
 }
 
-export function addFriend(name: string, note?: string): Friend {
+export async function addFriend(name: string, note?: string): Promise<Friend> {
+  const trimmed = name.trim()
+  const profile = await resolveMojang(trimmed)
   const friend: Friend = {
     id: randomUUID(),
-    name: name.trim(),
+    name: profile?.name ?? trimmed,
+    uuid: profile?.id,
+    verified: !!profile,
     status: 'offline',
     note,
     addedAt: Date.now()

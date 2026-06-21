@@ -100,10 +100,10 @@ export function ModDetail(): JSX.Element {
               <img
                 src={project.icon_url}
                 alt=""
-                style={{ width: 78, height: 78, borderRadius: 16, background: 'var(--bg-3)' }}
+                style={{ width: 78, height: 78, borderRadius: 16, background: 'var(--ink-600)' }}
               />
             ) : (
-              <div style={{ width: 78, height: 78, borderRadius: 16, background: 'var(--bg-3)' }} />
+              <div style={{ width: 78, height: 78, borderRadius: 16, background: 'var(--ink-600)' }} />
             )}
             <div>
               <h1 style={{ fontSize: 24 }}>{project.title}</h1>
@@ -137,7 +137,7 @@ export function ModDetail(): JSX.Element {
                   key={g.url}
                   src={g.url}
                   alt={g.title ?? ''}
-                  style={{ width: '100%', borderRadius: 12, border: '1px solid var(--border)' }}
+                  style={{ width: '100%', borderRadius: 12, border: '1px solid var(--line)' }}
                 />
               ))}
             </div>

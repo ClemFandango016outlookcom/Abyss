@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Info, Trash2, UserPlus, Users } from 'lucide-react'
+import { BadgeCheck, Info, Trash2, UserPlus, Users } from 'lucide-react'
 import { useStore } from '../store'
 import type { Friend } from '../../../shared/types'
 
@@ -13,12 +13,18 @@ export function Friends(): JSX.Element {
 
   const [name, setName] = useState('')
   const [note, setNote] = useState('')
+  const [busy, setBusy] = useState(false)
 
   const add = async (): Promise<void> => {
-    if (!name.trim()) return
-    await addFriend(name.trim(), note.trim() || undefined)
-    setName('')
-    setNote('')
+    if (!name.trim() || busy) return
+    setBusy(true)
+    try {
+      await addFriend(name.trim(), note.trim() || undefined)
+      setName('')
+      setNote('')
+    } finally {
+      setBusy(false)
+    }
   }
 
   return (
@@ -31,8 +37,8 @@ export function Friends(): JSX.Element {
 
       <div className="banner warn">
         <Info size={16} />
-        Friends are stored locally on this machine for now — live presence syncing arrives with the
-        Abyss network service.
+        Usernames are checked against Mojang, so every friend is a real Minecraft account with their
+        real skin. Stored locally for now; live presence needs a backend Abyss doesn&apos;t have yet.
       </div>
 
       <div className="card" style={{ padding: 16, marginBottom: 22 }}>
@@ -51,8 +57,8 @@ export function Friends(): JSX.Element {
             onChange={(e) => setNote(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && add()}
           />
-          <button className="btn primary" onClick={add} disabled={!name.trim()}>
-            <UserPlus size={16} /> Add
+          <button className="btn primary" onClick={add} disabled={!name.trim() || busy}>
+            {busy ? <span className="spinner" /> : <UserPlus size={16} />} Add
           </button>
         </div>
       </div>
@@ -67,12 +73,15 @@ export function Friends(): JSX.Element {
           <div key={f.id} className="friend-row card">
             <span className={`status-dot ${f.status}`} />
             <img
-              src={`https://mc-heads.net/avatar/${encodeURIComponent(f.name)}/38`}
+              src={`https://mc-heads.net/avatar/${f.uuid ?? encodeURIComponent(f.name)}/38`}
               alt=""
-              style={{ width: 38, height: 38, borderRadius: 9, background: 'var(--bg-3)' }}
+              style={{ width: 38, height: 38, borderRadius: 9, background: 'var(--ink-600)' }}
             />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontWeight: 600 }}>{f.name}</div>
+              <div className="row" style={{ gap: 6, fontWeight: 600 }}>
+                {f.name}
+                {f.verified && <BadgeCheck size={15} color="var(--aqua)" />}
+              </div>
               {f.note && <div className="muted">{f.note}</div>}
             </div>
             <select

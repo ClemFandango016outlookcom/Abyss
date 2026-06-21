@@ -2,12 +2,12 @@
 
 export type Loader = 'vanilla' | 'fabric' | 'quilt' | 'forge' | 'neoforge'
 
-export const LOADERS: { id: Loader; label: string; supported: boolean }[] = [
+export const LOADERS: { id: Loader; label: string; supported: boolean; experimental?: boolean }[] = [
   { id: 'vanilla', label: 'Vanilla', supported: true },
   { id: 'fabric', label: 'Fabric', supported: true },
   { id: 'quilt', label: 'Quilt', supported: true },
-  { id: 'forge', label: 'Forge', supported: false },
-  { id: 'neoforge', label: 'NeoForge', supported: false }
+  { id: 'neoforge', label: 'NeoForge', supported: true, experimental: true },
+  { id: 'forge', label: 'Forge', supported: true, experimental: true }
 ]
 
 export interface AbyssAccount {
@@ -63,6 +63,10 @@ export interface AbyssSettings {
 export interface Friend {
   id: string
   name: string
+  /** Real Minecraft account UUID, when the username resolved against Mojang. */
+  uuid?: string
+  /** True when the username matched a real Minecraft: Java account. */
+  verified?: boolean
   /** Free-form status the user can set */
   status: 'online' | 'offline' | 'away' | 'in-game'
   note?: string

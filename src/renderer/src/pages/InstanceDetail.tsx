@@ -136,7 +136,7 @@ export function InstanceDetail(): JSX.Element {
               {mod.iconUrl ? (
                 <img src={mod.iconUrl} alt="" style={{ width: 38, height: 38, borderRadius: 9 }} />
               ) : (
-                <div style={{ width: 38, height: 38, borderRadius: 9, background: 'var(--bg-3)' }} />
+                <div style={{ width: 38, height: 38, borderRadius: 9, background: 'var(--ink-600)' }} />
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 600 }}>{mod.title}</div>

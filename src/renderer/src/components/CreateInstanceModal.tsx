@@ -137,13 +137,25 @@ export function CreateInstanceModal({ onClose, onCreated }: Props): JSX.Element 
               className={`btn sm ${loader === l.id ? 'primary' : ''}`}
               onClick={() => setLoader(l.id)}
               disabled={!l.supported}
-              title={l.supported ? '' : 'Coming soon'}
             >
               {l.label}
-              {!l.supported && ' (soon)'}
+              {l.experimental && (
+                <span
+                  className="mono"
+                  style={{ fontSize: 9, opacity: 0.7, letterSpacing: '0.08em' }}
+                >
+                  BETA
+                </span>
+              )}
             </button>
           ))}
         </div>
+        {loaderMeta?.experimental && (
+          <p className="muted" style={{ marginTop: 8 }}>
+            {loaderMeta.label} support is experimental. The first launch runs the official installer
+            and can take a few minutes.
+          </p>
+        )}
       </div>
 
       {loader !== 'vanilla' && (
