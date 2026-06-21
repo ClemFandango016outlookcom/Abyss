@@ -79,6 +79,10 @@ export interface AbyssSettings {
   /** Close launcher when the game starts */
   closeOnLaunch: boolean
   theme: 'abyss' | 'midnight' | 'void'
+  /** Show Abyss in your Discord status (Rich Presence) */
+  discordRpc: boolean
+  /** Discord application Client ID used for Rich Presence */
+  discordClientId: string
 }
 
 export interface Friend {

@@ -25,6 +25,8 @@ React and TypeScript.
   or removing it. Instances sort by most recently played.
 - A friends list. Usernames are checked against Mojang, so each friend is a real account with their
   real skin. Stored locally; there's no presence backend yet.
+- Discord Rich Presence — shows what you're playing in your Discord status with a timer and a link
+  back to Abyss. Needs a free Discord application Client ID, set in Settings → Discord.
 
 ## Running it
 

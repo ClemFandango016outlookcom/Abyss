@@ -131,8 +131,46 @@ export function SettingsPage(): JSX.Element | null {
         </div>
       </div>
 
+      <div className="divider" />
+
+      {/* Discord */}
+      <h2 style={{ fontSize: 18, marginBottom: 14 }}>Discord</h2>
+      <div className="card" style={{ padding: 18, maxWidth: 560 }}>
+        <label className="row" style={{ gap: 9, cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            checked={settings.discordRpc}
+            onChange={(e) => updateSettings({ discordRpc: e.target.checked })}
+          />
+          <span>Show Abyss in my Discord status (Rich Presence)</span>
+        </label>
+
+        {settings.discordRpc && (
+          <>
+            <div className="field" style={{ marginTop: 16, marginBottom: 8 }}>
+              <label>Discord application Client ID</label>
+              <input
+                className="input"
+                placeholder="e.g. 1318020427421548615"
+                value={settings.discordClientId}
+                onChange={(e) => updateSettings({ discordClientId: e.target.value })}
+              />
+            </div>
+            <p className="muted" style={{ lineHeight: 1.55 }}>
+              Create a free app at{' '}
+              <a href="https://discord.com/developers/applications" target="_blank" rel="noreferrer">
+                discord.com/developers
+              </a>
+              , name it “Abyss”, then copy its <b>Application ID</b> into the box above. Optionally
+              upload a 512×512 logo named <span className="mono">abyss</span> under Rich Presence → Art
+              Assets to show the icon. Discord must be running on this PC.
+            </p>
+          </>
+        )}
+      </div>
+
       <p className="muted mono" style={{ marginTop: 24 }}>
-        Abyss v0.5.0 · mods by Modrinth
+        Abyss v0.6.0 · mods by Modrinth
       </p>
     </div>
   )

@@ -20,6 +20,7 @@ import {
 } from './instances'
 import { listFriends, addFriend, removeFriend, updateFriend } from './friends'
 import { installModpack } from './modpack'
+import { discord } from './discord'
 
 /** Wrap a handler so the renderer always receives { ok, data?, error? }. */
 function handle<T>(channel: string, fn: (...args: never[]) => Promise<T> | T): void {
@@ -35,6 +36,10 @@ function handle<T>(channel: string, fn: (...args: never[]) => Promise<T> | T): v
 }
 
 export function registerIpc(getWindow: () => BrowserWindow | null): void {
+  // Start Discord Rich Presence if the user has it enabled.
+  const startup = getSettings()
+  discord.configure(startup.discordRpc, startup.discordClientId)
+
   // ---- window controls ----
   handle(IPC.windowMinimize, () => getWindow()?.minimize())
   handle(IPC.windowMaximize, () => {
@@ -46,7 +51,11 @@ export function registerIpc(getWindow: () => BrowserWindow | null): void {
 
   // ---- settings ----
   handle(IPC.settingsGet, () => getSettings())
-  handle(IPC.settingsUpdate, (patch) => updateSettings(patch))
+  handle(IPC.settingsUpdate, (patch) => {
+    const next = updateSettings(patch)
+    discord.configure(next.discordRpc, next.discordClientId)
+    return next
+  })
 
   // ---- accounts ----
   handle(IPC.accountsList, () => getAccounts())
@@ -85,6 +94,8 @@ export function registerIpc(getWindow: () => BrowserWindow | null): void {
     const win = getWindow()
     const emit = (s: LaunchStatus): void => {
       win?.webContents.send(IPC.launchStatus, s)
+      if (s.phase === 'running') discord.setPlaying(instance.name, instance.mcVersion, instance.loader)
+      else if (s.phase === 'closed' || s.phase === 'error') discord.setLauncher()
     }
     const logEmit = (l: GameLogLine): void => {
       win?.webContents.send(IPC.gameLog, l)

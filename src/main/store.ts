@@ -19,7 +19,9 @@ const defaults: AbyssSchema = {
     gameDir: defaultGameDir,
     defaultMemoryMb: 4096,
     closeOnLaunch: false,
-    theme: 'abyss'
+    theme: 'abyss',
+    discordRpc: false,
+    discordClientId: ''
   },
   accounts: [],
   instances: [],
