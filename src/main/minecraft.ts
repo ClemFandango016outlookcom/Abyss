@@ -27,6 +27,17 @@ function xmlVersions(xml: string): string[] {
   return [...xml.matchAll(/<version>([^<]+)<\/version>/g)].map((m) => m[1])
 }
 
+/**
+ * Resolves the Java executable to launch with. On Windows we prefer `javaw`
+ * (the windowless launcher) so no console window pops up while the game runs.
+ */
+function resolveJava(): string | undefined {
+  const custom = getSettings().javaPath?.trim()
+  if (process.platform !== 'win32') return custom || undefined
+  if (custom) return custom.replace(/javaw?(\.exe)?$/i, 'javaw.exe')
+  return 'javaw'
+}
+
 // Track running game processes so they can be killed.
 const running = new Map<string, ChildProcess>()
 
@@ -144,7 +155,6 @@ export async function launchInstance(
   logEmit: (line: GameLogLine) => void = () => {}
 ): Promise<void> {
   const id = instance.id
-  const settings = getSettings()
   const status = (phase: LaunchStatus['phase'], message: string, progress?: number): void =>
     emit({ instanceId: id, phase, message, progress })
 
@@ -210,7 +220,10 @@ export async function launchInstance(
       gameDirectory: instanceDir(id),
       maxSockets: 8
     },
-    ...(settings.javaPath ? { javaPath: settings.javaPath } : {})
+    ...((): { javaPath?: string } => {
+      const java = resolveJava()
+      return java ? { javaPath: java } : {}
+    })()
   })
 
   if (proc) {
