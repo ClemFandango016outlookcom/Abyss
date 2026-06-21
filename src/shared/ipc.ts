@@ -47,7 +47,13 @@ export const IPC = {
   friendsList: 'friends:list',
   friendAdd: 'friend:add',
   friendRemove: 'friend:remove',
-  friendUpdate: 'friend:update'
+  friendUpdate: 'friend:update',
+
+  // app self-update
+  updateCheck: 'update:check',
+  updateInstall: 'update:install',
+  updateStatusGet: 'update:statusGet',
+  updateStatus: 'update:status' // main -> renderer event
 } as const
 
 export type IpcChannel = (typeof IPC)[keyof typeof IPC]

@@ -15,7 +15,8 @@ import type {
   ModrinthSearchResponse,
   ModrinthVersion,
   ModUpdate,
-  SearchParams
+  SearchParams,
+  UpdateStatus
 } from '../shared/types'
 
 /** Invoke an IPC handler and unwrap the { ok, data, error } envelope. */
@@ -86,17 +87,34 @@ const api = {
     remove: (id: string) => invoke<void>(IPC.friendRemove, id),
     update: (id: string, patch: Partial<Friend>) => invoke<Friend | null>(IPC.friendUpdate, id, patch)
   },
+  updates: {
+    check: () => invoke<UpdateStatus>(IPC.updateCheck),
+    install: () => invoke<void>(IPC.updateInstall),
+    getStatus: () => invoke<UpdateStatus>(IPC.updateStatusGet)
+  },
   /** Subscribe to launch lifecycle events. Returns an unsubscribe function. */
   onLaunchStatus: (cb: (status: LaunchStatus) => void) => {
     const listener = (_e: unknown, status: LaunchStatus): void => cb(status)
     ipcRenderer.on(IPC.launchStatus, listener)
-    return () => ipcRenderer.removeListener(IPC.launchStatus, listener)
+    return () => {
+      ipcRenderer.removeListener(IPC.launchStatus, listener)
+    }
   },
   /** Subscribe to live game log lines. Returns an unsubscribe function. */
   onGameLog: (cb: (line: GameLogLine) => void) => {
     const listener = (_e: unknown, line: GameLogLine): void => cb(line)
     ipcRenderer.on(IPC.gameLog, listener)
-    return () => ipcRenderer.removeListener(IPC.gameLog, listener)
+    return () => {
+      ipcRenderer.removeListener(IPC.gameLog, listener)
+    }
+  },
+  /** Subscribe to self-update status. Returns an unsubscribe function. */
+  onUpdateStatus: (cb: (status: UpdateStatus) => void) => {
+    const listener = (_e: unknown, status: UpdateStatus): void => cb(status)
+    ipcRenderer.on(IPC.updateStatus, listener)
+    return () => {
+      ipcRenderer.removeListener(IPC.updateStatus, listener)
+    }
   }
 }
 

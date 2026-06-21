@@ -1,6 +1,6 @@
 {
   "name": "abyss",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "Abyss — a Minecraft launcher and mod browser (Modrinth-powered)",
   "author": "Abyss",
   "license": "MIT",
@@ -21,6 +21,7 @@
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "adm-zip": "^0.5.17",
     "electron-store": "^8.2.0",
+    "electron-updater": "^6.8.9",
     "minecraft-launcher-core": "^3.18.2",
     "msmc": "^4.1.0"
   },

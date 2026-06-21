@@ -55,6 +55,28 @@ export interface GameLogLine {
   level: 'info' | 'debug'
 }
 
+// ---- app self-update ----
+export type UpdateState =
+  | 'idle'
+  | 'checking'
+  | 'available'
+  | 'not-available'
+  | 'downloading'
+  | 'downloaded'
+  | 'error'
+  | 'disabled'
+
+export interface UpdateStatus {
+  /** The version currently running. */
+  current: string
+  state: UpdateState
+  /** The newer version, when one is available. */
+  version?: string
+  /** Download progress 0..100. */
+  percent?: number
+  error?: string
+}
+
 export interface GameInstance {
   id: string
   name: string

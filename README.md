@@ -27,6 +27,8 @@ React and TypeScript.
   real skin. Stored locally; there's no presence backend yet.
 - Discord Rich Presence — shows what you're playing in your Discord status with a timer and a link
   back to Abyss. Needs a free Discord application Client ID, set in Settings → Discord.
+- Updates itself — checks GitHub Releases on startup and downloads and installs new versions from
+  Settings → Updates, so you don't have to grab each build by hand.
 
 ## Running it
 

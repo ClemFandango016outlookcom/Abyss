@@ -22,3 +22,7 @@ linux:
   target:
     - AppImage
   category: Game
+publish:
+  provider: github
+  owner: ClemFandango016outlookcom
+  repo: Abyss

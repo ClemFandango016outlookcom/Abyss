@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron'
 import { IPC } from '../shared/ipc'
-import type { GameLogLine, LaunchStatus } from '../shared/types'
+import type { GameLogLine, LaunchStatus, UpdateStatus } from '../shared/types'
 import { getSettings, updateSettings, getAccounts, setAccounts } from './store'
 import { loginInteractive, logout, getLaunchUser } from './auth'
 import { getVanillaVersions, getLoaderVersions, launchInstance, killInstance } from './minecraft'
@@ -21,6 +21,7 @@ import {
 import { listFriends, addFriend, removeFriend, updateFriend } from './friends'
 import { installModpack } from './modpack'
 import { discord } from './discord'
+import { initUpdater, checkForUpdates, quitAndInstall, getUpdateStatus } from './updater'
 
 /** Wrap a handler so the renderer always receives { ok, data?, error? }. */
 function handle<T>(channel: string, fn: (...args: never[]) => Promise<T> | T): void {
@@ -39,6 +40,9 @@ export function registerIpc(getWindow: () => BrowserWindow | null): void {
   // Start Discord Rich Presence if the user has it enabled.
   const startup = getSettings()
   discord.configure(startup.discordRpc, startup.discordClientId)
+
+  // App self-updater — checks GitHub Releases and streams status to the UI.
+  initUpdater((s: UpdateStatus) => getWindow()?.webContents.send(IPC.updateStatus, s))
 
   // ---- window controls ----
   handle(IPC.windowMinimize, () => getWindow()?.minimize())
@@ -141,4 +145,9 @@ export function registerIpc(getWindow: () => BrowserWindow | null): void {
   handle(IPC.friendAdd, (name, note) => addFriend(name, note))
   handle(IPC.friendRemove, (id: string) => removeFriend(id))
   handle(IPC.friendUpdate, (id, patch) => updateFriend(id, patch))
+
+  // ---- self-update ----
+  handle(IPC.updateStatusGet, () => getUpdateStatus())
+  handle(IPC.updateCheck, () => checkForUpdates())
+  handle(IPC.updateInstall, () => quitAndInstall())
 }
