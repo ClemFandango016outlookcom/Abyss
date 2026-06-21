@@ -8,12 +8,16 @@ mods and drop them straight into an instance, keep separate instances on differe
 loaders, sign in with your Microsoft account and launch the game. It's an Electron app written in
 React and TypeScript.
 
+**Website:** https://clemfandango016outlookcom.github.io/Abyss/ — **Downloads:** [Releases](https://github.com/ClemFandango016outlookcom/Abyss/releases)
+
 ## What works so far
 
 - Launching vanilla, Fabric and Quilt, plus NeoForge and Forge (experimental — they pull the
   official installer and run it on first launch, which can take a few minutes).
 - Microsoft login (via msmc). The session refreshes itself so you only sign in once.
 - Searching Modrinth for mods, modpacks, resource packs and shaders, and installing into an instance.
+- Installing a whole Modrinth modpack (.mrpack) in one click — Abyss creates a matching instance and
+  downloads every mod and config file in the pack.
 - Making and deleting instances, setting how much RAM each one gets, turning mods on/off or removing them.
 - A friends list. Usernames are checked against Mojang, so each friend is a real account with their
   real skin. Stored locally; there's no presence backend yet.
@@ -51,7 +55,6 @@ The UI never touches the network or the disk directly. It all goes through the I
 
 ## Still on the list
 
-- One-click modpack (.mrpack) installs
 - Working out mod dependencies automatically
 - An actual backend so the friends list shows live presence
 - Checking installed mods for updates

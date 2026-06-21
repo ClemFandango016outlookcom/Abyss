@@ -67,7 +67,9 @@ const api = {
     remove: (instanceId: string, projectId: string) =>
       invoke<void>(IPC.modRemove, instanceId, projectId),
     toggle: (instanceId: string, projectId: string, enabled: boolean) =>
-      invoke<void>(IPC.modToggle, instanceId, projectId, enabled)
+      invoke<void>(IPC.modToggle, instanceId, projectId, enabled),
+    installModpack: (version: ModrinthVersion, meta: { title: string; iconUrl?: string }) =>
+      invoke<GameInstance>(IPC.modpackInstall, version, meta)
   },
   friends: {
     list: () => invoke<Friend[]>(IPC.friendsList),

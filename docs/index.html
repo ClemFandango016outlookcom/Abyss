@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Abyss — Minecraft launcher & mod browser</title>
+    <meta
+      name="description"
+      content="Abyss is a desktop Minecraft launcher with a built-in Modrinth mod browser. Launch any version and loader, install mods and modpacks in a click."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink-900: #03080b;
+        --ink-850: #050d12;
+        --ink-800: #081319;
+        --ink-600: #143040;
+        --surface: rgba(11, 26, 34, 0.66);
+        --surface-2: rgba(17, 37, 47, 0.55);
+        --surface-hi: rgba(26, 54, 66, 0.7);
+        --line: rgba(116, 214, 200, 0.12);
+        --line-2: rgba(116, 214, 200, 0.24);
+        --line-3: rgba(116, 214, 200, 0.4);
+        --aqua: #3fe7c4;
+        --aqua-bright: #7bffe4;
+        --aqua-deep: #15a892;
+        --aqua-glow: rgba(63, 231, 196, 0.32);
+        --aqua-faint: rgba(63, 231, 196, 0.12);
+        --lure: #ffc673;
+        --lure-2: #ff9e45;
+        --lure-ink: #2a1604;
+        --lure-glow: rgba(255, 165, 75, 0.4);
+        --text: #e9f6f4;
+        --text-dim: #93aeb3;
+        --text-faint: #587078;
+        --font-display: 'Bricolage Grotesque', 'Segoe UI', sans-serif;
+        --font-body: 'Hanken Grotesk', 'Segoe UI', sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html { scroll-behavior: smooth; }
+      body {
+        font-family: var(--font-body);
+        color: var(--text);
+        background:
+          radial-gradient(120% 60% at 50% -10%, var(--aqua-faint), transparent 50%),
+          radial-gradient(80% 50% at 12% 5%, rgba(63, 231, 196, 0.06), transparent 60%),
+          linear-gradient(180deg, var(--ink-800) 0%, var(--ink-850) 40%, var(--ink-900) 100%);
+        background-attachment: fixed;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+      .grain {
+        position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.05; mix-blend-mode: overlay;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+      .wrap { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+      a { color: var(--aqua); text-decoration: none; }
+
+      nav {
+        position: sticky; top: 0; z-index: 10;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 24px; max-width: 1128px; margin: 0 auto;
+        backdrop-filter: blur(10px);
+      }
+      .brand { display: flex; align-items: center; gap: 11px; font-family: var(--font-display);
+        font-weight: 800; font-size: 17px; letter-spacing: 0.36em; }
+      .brand svg { filter: drop-shadow(0 0 7px var(--aqua-glow)); }
+      .nav-links { display: flex; align-items: center; gap: 26px; font-size: 14px; font-weight: 600; }
+      .nav-links a { color: var(--text-dim); }
+      .nav-links a:hover { color: var(--text); }
+
+      .btn { display: inline-flex; align-items: center; gap: 9px; padding: 12px 22px; border-radius: 11px;
+        font-family: var(--font-body); font-weight: 700; font-size: 15px; cursor: pointer;
+        border: 1px solid var(--line-2); background: var(--surface-2); color: var(--text); transition: transform .14s, filter .14s, box-shadow .14s; }
+      .btn:hover { transform: translateY(-2px); }
+      .btn.lure { background: linear-gradient(135deg, var(--lure), var(--lure-2)); color: var(--lure-ink);
+        border-color: transparent; box-shadow: 0 14px 40px -10px var(--lure-glow); }
+      .btn.aqua { background: linear-gradient(135deg, var(--aqua), var(--aqua-deep)); color: #04201b; border-color: transparent; }
+      .btn.sm { padding: 8px 15px; font-size: 13.5px; }
+
+      .hero { text-align: center; padding: 70px 0 40px; }
+      .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.34em; text-transform: uppercase;
+        color: var(--aqua); display: inline-flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+      .eyebrow::before, .eyebrow::after { content: ''; width: 26px; height: 1px; background: linear-gradient(90deg, transparent, var(--aqua)); }
+      .eyebrow::after { background: linear-gradient(90deg, var(--aqua), transparent); }
+      h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(42px, 7vw, 74px); line-height: 1.02;
+        letter-spacing: -0.03em; background: linear-gradient(180deg, #fbfffe, #9fc7c1);
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+      .hero p { color: var(--text-dim); font-size: clamp(16px, 2vw, 19px); line-height: 1.6;
+        max-width: 620px; margin: 22px auto 32px; }
+      .cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+      .req { margin-top: 18px; font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); letter-spacing: 0.03em; }
+
+      /* App preview mockup */
+      .shot { margin: 56px auto 0; max-width: 940px; border-radius: 18px; overflow: hidden;
+        border: 1px solid var(--line-2); box-shadow: 0 60px 130px -40px #000, 0 0 80px -30px var(--aqua-glow);
+        background: radial-gradient(120% 70% at 50% -20%, var(--aqua-faint), transparent 50%), linear-gradient(180deg, var(--ink-800), var(--ink-900)); }
+      .shot .bar { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 38px;
+        border-bottom: 1px solid var(--line); font-family: var(--font-display); font-weight: 800; letter-spacing: 0.4em; font-size: 13px; }
+      .shot .bar .dots { display: flex; gap: 16px; color: var(--text-faint); font-size: 12px; }
+      .shot .ui { display: grid; grid-template-columns: 200px 1fr; min-height: 380px; }
+      .shot .side { border-right: 1px solid var(--line); padding: 18px 12px; display: flex; flex-direction: column; gap: 4px; }
+      .shot .side .lbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.26em; color: var(--text-faint); padding: 4px 12px 10px; }
+      .shot .side a { display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: 8px; color: var(--text-dim); font-size: 13px; font-weight: 600; }
+      .shot .side a .d { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: .5; }
+      .shot .side a.on { color: #eafffb; background: linear-gradient(90deg, var(--aqua-faint), transparent 80%); }
+      .shot .side a.on .d { background: var(--aqua); opacity: 1; box-shadow: 0 0 10px var(--aqua); }
+      .shot .main { padding: 26px 28px; }
+      .shot .main .eb { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--aqua); margin-bottom: 8px; }
+      .shot .main h3 { font-family: var(--font-display); font-size: 26px; font-weight: 800; margin-bottom: 18px; }
+      .shot .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      .shot .c { padding: 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 13px; }
+      .shot .c .top { display: flex; gap: 12px; align-items: center; }
+      .shot .c .ic { width: 42px; height: 42px; border-radius: 11px; display: grid; place-items: center; font-family: var(--font-display);
+        font-weight: 800; color: var(--aqua-bright); background: linear-gradient(150deg, var(--surface-hi), rgba(3,8,11,.5)); border: 1px solid var(--line-2); }
+      .shot .c .nm { font-family: var(--font-display); font-weight: 700; font-size: 15px; }
+      .shot .c .vr { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+      .shot .c .play { padding: 8px; border-radius: 8px; text-align: center; font-weight: 700; font-size: 13px;
+        background: linear-gradient(135deg, var(--lure), var(--lure-2)); color: var(--lure-ink); }
+
+      section { padding: 60px 0; }
+      .sec-head { text-align: center; margin-bottom: 42px; }
+      .sec-head h2 { font-family: var(--font-display); font-size: clamp(28px, 4vw, 40px); font-weight: 800; letter-spacing: -0.02em; }
+      .sec-head p { color: var(--text-dim); margin-top: 10px; font-size: 16px; }
+      .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+      .feat { padding: 24px; border-radius: 15px; background: var(--surface); border: 1px solid var(--line); transition: transform .16s, border-color .16s; }
+      .feat:hover { transform: translateY(-4px); border-color: var(--line-2); }
+      .feat .ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; margin-bottom: 16px; font-size: 20px;
+        background: var(--aqua-faint); border: 1px solid var(--line-2); }
+      .feat h3 { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+      .feat p { color: var(--text-dim); font-size: 14px; line-height: 1.55; }
+
+      .download { text-align: center; padding: 70px 32px; margin: 30px 0; border-radius: 22px;
+        background: radial-gradient(100% 100% at 50% 0%, var(--aqua-faint), transparent 60%), var(--surface);
+        border: 1px solid var(--line-2); }
+      .download h2 { font-family: var(--font-display); font-size: clamp(28px, 4vw, 40px); font-weight: 800; }
+      .download p { color: var(--text-dim); margin: 14px auto 26px; max-width: 480px; }
+      .smol { margin-top: 20px; font-size: 13px; color: var(--text-faint); max-width: 520px; margin-left: auto; margin-right: auto; line-height: 1.5; }
+
+      footer { border-top: 1px solid var(--line); padding: 34px 0 50px; margin-top: 30px; color: var(--text-faint); font-size: 13px; }
+      footer .row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; align-items: center; }
+      footer a { color: var(--text-dim); }
+    </style>
+  </head>
+  <body>
+    <div class="grain"></div>
+
+    <nav>
+      <div class="brand">
+        <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+          <defs>
+            <radialGradient id="cr" cx="50%" cy="45%" r="55%"><stop offset="0%" stop-color="#c8fff4" /><stop offset="100%" stop-color="#2bbfa6" /></radialGradient>
+            <linearGradient id="rg" x1="16" y1="2" x2="16" y2="30" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#7bffe4" /><stop offset="100%" stop-color="#129a86" /></linearGradient>
+          </defs>
+          <circle cx="16" cy="16" r="14" stroke="url(#rg)" stroke-width="1.5" opacity="0.32" />
+          <circle cx="16" cy="16" r="10" stroke="url(#rg)" stroke-width="1.8" opacity="0.6" />
+          <circle cx="16" cy="16" r="6" stroke="url(#rg)" stroke-width="2" opacity="0.92" />
+          <circle cx="16" cy="16" r="2.6" fill="url(#cr)" />
+        </svg>
+        ABYSS
+      </div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#download">Download</a>
+        <a href="https://github.com/ClemFandango016outlookcom/Abyss">GitHub</a>
+      </div>
+    </nav>
+
+    <header class="wrap hero">
+      <div class="eyebrow">Minecraft launcher</div>
+      <h1>Dive into the<br />deep end of mods</h1>
+      <p>
+        Abyss is a desktop Minecraft launcher with a Modrinth browser built in. Launch any version
+        and loader, install mods and whole modpacks in a click, and keep your worlds in tidy,
+        separate instances.
+      </p>
+      <div class="cta">
+        <a class="btn lure" href="https://github.com/ClemFandango016outlookcom/Abyss/releases/latest">
+          ▼ Download for Windows
+        </a>
+        <a class="btn" href="https://github.com/ClemFandango016outlookcom/Abyss">View on GitHub</a>
+      </div>
+      <div class="req">Windows 10/11 · needs Java 17+ and a Minecraft: Java account</div>
+
+      <div class="shot">
+        <div class="bar">ABYSS<span class="dots">— ▢ ✕</span></div>
+        <div class="ui">
+          <div class="side">
+            <div class="lbl">MENU</div>
+            <a class="on"><span class="d"></span> Play</a>
+            <a><span class="d"></span> Browse Mods</a>
+            <a><span class="d"></span> Friends</a>
+            <a><span class="d"></span> Settings</a>
+          </div>
+          <div class="main">
+            <div class="eb">— Launcher</div>
+            <h3>Play</h3>
+            <div class="cards">
+              <div class="c">
+                <div class="top"><div class="ic">F</div><div><div class="nm">Fabric Performance</div><div class="vr">1.21.1 · fabric</div></div></div>
+                <div class="play">▶ Play</div>
+              </div>
+              <div class="c">
+                <div class="top"><div class="ic">N</div><div><div class="nm">NeoForge Pack</div><div class="vr">1.21.1 · neoforge</div></div></div>
+                <div class="play">▶ Play</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="features" class="wrap">
+      <div class="sec-head">
+        <h2>Everything in one place</h2>
+        <p>Browse, install and launch without juggling websites and folders.</p>
+      </div>
+      <div class="features">
+        <div class="feat">
+          <div class="ico">🜄</div>
+          <h3>Launch any version</h3>
+          <p>Every Minecraft release and snapshot, with Fabric, Quilt, NeoForge and Forge loaders.</p>
+        </div>
+        <div class="feat">
+          <div class="ico">⌕</div>
+          <h3>Modrinth, built in</h3>
+          <p>Search the full Modrinth catalogue and drop mods straight into an instance in one click.</p>
+        </div>
+        <div class="feat">
+          <div class="ico">▣</div>
+          <h3>One-click modpacks</h3>
+          <p>Install a whole .mrpack and Abyss builds a matching instance with every mod and config.</p>
+        </div>
+        <div class="feat">
+          <div class="ico">◈</div>
+          <h3>Tidy instances</h3>
+          <p>Separate versions, mods and saves per instance, each with its own memory allocation.</p>
+        </div>
+        <div class="feat">
+          <div class="ico">⬡</div>
+          <h3>Real Microsoft login</h3>
+          <p>Sign in once with your Microsoft account; the session refreshes itself after that.</p>
+        </div>
+        <div class="feat">
+          <div class="ico">◎</div>
+          <h3>Friends</h3>
+          <p>Keep a friends list of real Minecraft accounts, checked against Mojang with their skins.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" id="download">
+      <div class="download">
+        <h2>Get Abyss</h2>
+        <p>Grab the latest Windows build — an installer or a portable zip, whichever you prefer.</p>
+        <div class="cta">
+          <a class="btn lure" href="https://github.com/ClemFandango016outlookcom/Abyss/releases/latest">▼ Download latest release</a>
+          <a class="btn aqua sm" href="https://github.com/ClemFandango016outlookcom/Abyss">Source code</a>
+        </div>
+        <p class="smol">
+          The build isn't code-signed yet, so Windows SmartScreen may warn you — click “More info”
+          then “Run anyway”. You'll need Java 17+ and a Microsoft account that owns Minecraft: Java
+          Edition to actually launch the game.
+        </p>
+      </div>
+    </section>
+
+    <footer class="wrap">
+      <div class="row">
+        <div>Abyss · open source under the MIT license</div>
+        <div>
+          <a href="https://github.com/ClemFandango016outlookcom/Abyss">GitHub</a> ·
+          <a href="https://modrinth.com">Mods by Modrinth</a>
+        </div>
+      </div>
+      <p style="margin-top: 14px; max-width: 640px; line-height: 1.5">
+        Not affiliated with Modrinth, Mojang or Microsoft. Minecraft is a trademark of Mojang
+        Studios; you need to own a copy to play.
+      </p>
+    </footer>
+  </body>
+</html>

@@ -37,6 +37,7 @@ export const IPC = {
   modInstall: 'mod:install',
   modRemove: 'mod:remove',
   modToggle: 'mod:toggle',
+  modpackInstall: 'modpack:install',
 
   // friends
   friendsList: 'friends:list',

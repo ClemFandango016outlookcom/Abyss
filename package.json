@@ -1,6 +1,6 @@
 {
   "name": "abyss",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Abyss — a Minecraft launcher and mod browser (Modrinth-powered)",
   "author": "Abyss",
   "license": "MIT",
@@ -19,11 +19,13 @@
     "@fontsource-variable/bricolage-grotesque": "^5.2.10",
     "@fontsource-variable/hanken-grotesk": "^5.2.8",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
+    "adm-zip": "^0.5.17",
     "electron-store": "^8.2.0",
     "minecraft-launcher-core": "^3.18.2",
     "msmc": "^4.1.0"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.8",
     "@types/node": "^20.14.10",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",

@@ -16,6 +16,7 @@ import {
   toggleMod
 } from './instances'
 import { listFriends, addFriend, removeFriend, updateFriend } from './friends'
+import { installModpack } from './modpack'
 
 /** Wrap a handler so the renderer always receives { ok, data?, error? }. */
 function handle<T>(channel: string, fn: (...args: never[]) => Promise<T> | T): void {
@@ -110,6 +111,10 @@ export function registerIpc(getWindow: () => BrowserWindow | null): void {
   handle(IPC.modToggle, (instanceId, projectId, enabled) =>
     toggleMod(instanceId, projectId, enabled)
   )
+  handle(IPC.modpackInstall, (version, meta) => {
+    const win = getWindow()
+    return installModpack(version, meta, (s) => win?.webContents.send(IPC.launchStatus, s))
+  })
 
   // ---- friends ----
   handle(IPC.friendsList, () => listFriends())
