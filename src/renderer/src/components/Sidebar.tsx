@@ -30,6 +30,7 @@ export function Sidebar(): JSX.Element {
 
   return (
     <aside className="sidebar">
+      <div className="nav-label">Menu</div>
       <nav style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {links.map(({ to, label, icon: Icon, end }) => (
           <NavLink
@@ -51,7 +52,7 @@ export function Sidebar(): JSX.Element {
           <img className="account-avatar" src={active.avatar} alt={active.name} />
           <div className="meta">
             <div className="name">{active.name}</div>
-            <div className="sub">Microsoft account</div>
+            <div className="sub">Microsoft</div>
           </div>
         </div>
       ) : (

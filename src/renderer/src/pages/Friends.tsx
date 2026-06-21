@@ -24,6 +24,7 @@ export function Friends(): JSX.Element {
   return (
     <div>
       <div className="page-head">
+        <div className="eyebrow">Social</div>
         <h1>Friends</h1>
         <p>Keep track of who you play with.</p>
       </div>

@@ -30,6 +30,7 @@ export function SettingsPage(): JSX.Element | null {
   return (
     <div>
       <div className="page-head">
+        <div className="eyebrow">Configuration</div>
         <h1>Settings</h1>
         <p>Accounts, memory and game options.</p>
       </div>
@@ -130,8 +131,8 @@ export function SettingsPage(): JSX.Element | null {
         </div>
       </div>
 
-      <p className="muted" style={{ marginTop: 24 }}>
-        Abyss v0.1.0 · Mods provided by Modrinth
+      <p className="muted mono" style={{ marginTop: 24 }}>
+        Abyss v0.2.0 · mods by Modrinth
       </p>
     </div>
   )

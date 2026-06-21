@@ -100,7 +100,7 @@ export function InstanceDetail(): JSX.Element {
               <Square size={15} /> Stop
             </button>
           ) : (
-            <button className="btn primary" disabled={busy || !hasAccount} onClick={onLaunch}>
+            <button className="btn lure" disabled={busy || !hasAccount} onClick={onLaunch}>
               {busy ? <span className="spinner" /> : <PlayIcon size={15} />}
               {busy ? 'Launching…' : 'Play'}
             </button>

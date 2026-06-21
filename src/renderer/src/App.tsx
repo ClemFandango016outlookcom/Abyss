@@ -25,29 +25,40 @@ export default function App(): JSX.Element {
   }, [theme])
 
   return (
-    <div className="app">
-      <Titlebar />
-      <div className="body">
-        <Sidebar />
-        <main className="content">
-          {ready ? (
-            <Routes>
-              <Route path="/" element={<Play />} />
-              <Route path="/browse" element={<Browse />} />
-              <Route path="/mod/:slug" element={<ModDetail />} />
-              <Route path="/instance/:id" element={<InstanceDetail />} />
-              <Route path="/friends" element={<Friends />} />
-              <Route path="/settings" element={<SettingsPage />} />
-            </Routes>
-          ) : (
-            <div className="loading">
-              <span className="spinner" />
-              <span>Descending into the Abyss…</span>
-            </div>
-          )}
-        </main>
+    <>
+      <div className="atmosphere">
+        <div className="beam" />
+        <div className="grain" />
+        <div className="vignette" />
       </div>
-      <LaunchToast />
-    </div>
+      <div className="app">
+        <Titlebar />
+        <div className="body">
+          <Sidebar />
+          <main className="content">
+            {ready ? (
+              <Routes>
+                <Route path="/" element={<Play />} />
+                <Route path="/browse" element={<Browse />} />
+                <Route path="/mod/:slug" element={<ModDetail />} />
+                <Route path="/instance/:id" element={<InstanceDetail />} />
+                <Route path="/friends" element={<Friends />} />
+                <Route path="/settings" element={<SettingsPage />} />
+              </Routes>
+            ) : (
+              <div className="loading">
+                <div className="sonar">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+                <span>Descending into the Abyss…</span>
+              </div>
+            )}
+          </main>
+        </div>
+        <LaunchToast />
+      </div>
+    </>
   )
 }

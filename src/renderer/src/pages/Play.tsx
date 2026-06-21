@@ -4,15 +4,6 @@ import { Folder, Play as PlayIcon, Plus, Settings2, Square, Boxes } from 'lucide
 import { useStore } from '../store'
 import { CreateInstanceModal } from '../components/CreateInstanceModal'
 import { timeAgo } from '../lib/format'
-import type { Loader } from '../../../shared/types'
-
-const loaderIcon: Record<Loader, string> = {
-  vanilla: '🟩',
-  fabric: '🧵',
-  quilt: '🧩',
-  forge: '⚒️',
-  neoforge: '🔥'
-}
 
 export function Play(): JSX.Element {
   const instances = useStore((s) => s.instances)
@@ -43,8 +34,9 @@ export function Play(): JSX.Element {
     <div>
       <div className="page-head row" style={{ justifyContent: 'space-between' }}>
         <div>
+          <div className="eyebrow">Launcher</div>
           <h1>Play</h1>
-          <p>Your Minecraft instances — launch, manage and mod them.</p>
+          <p>Launch, manage and mod your Minecraft instances.</p>
         </div>
         <button className="btn primary" onClick={() => setShowCreate(true)}>
           <Plus size={16} /> New instance
@@ -73,17 +65,18 @@ export function Play(): JSX.Element {
           {instances.map((inst) => (
             <div key={inst.id} className="instance-card card">
               <div className="head">
-                <div className="instance-icon">{loaderIcon[inst.loader]}</div>
+                <div className="instance-icon">{inst.name.trim().charAt(0) || 'A'}</div>
                 <div style={{ minWidth: 0 }}>
                   <div className="name">{inst.name}</div>
                   <div className="ver">
                     {inst.mcVersion} · {inst.loader}
+                    {inst.loaderVersion ? ` ${inst.loaderVersion}` : ''}
                   </div>
                 </div>
               </div>
-              <div className="row" style={{ justifyContent: 'space-between' }}>
-                <span className="muted">{inst.mods.length} mods</span>
-                <span className="muted">Played {timeAgo(inst.lastPlayed)}</span>
+              <div className="stat-row">
+                <span>{inst.mods.length} mods</span>
+                <span>played {timeAgo(inst.lastPlayed)}</span>
               </div>
               <div className="row" style={{ gap: 8 }}>
                 {isRunning(inst.id) ? (
@@ -92,7 +85,7 @@ export function Play(): JSX.Element {
                   </button>
                 ) : (
                   <button
-                    className="btn primary"
+                    className="btn lure"
                     style={{ flex: 1 }}
                     disabled={isBusy(inst.id) || !hasAccount}
                     onClick={() => onLaunch(inst.id)}
