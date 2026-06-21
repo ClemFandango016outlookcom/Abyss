@@ -181,8 +181,9 @@
         separate instances.
       </p>
       <div class="cta">
-        <a class="btn lure" href="https://github.com/ClemFandango016outlookcom/Abyss/releases/latest">
+        <a class="btn lure" data-dl-exe href="https://github.com/ClemFandango016outlookcom/Abyss/releases/latest">
           ▼ Download for Windows
+          <span data-dl-tag style="font-family: var(--font-mono); font-size: 12px; opacity: 0.85"></span>
         </a>
         <a class="btn" href="https://github.com/ClemFandango016outlookcom/Abyss">View on GitHub</a>
       </div>
@@ -260,8 +261,11 @@
         <h2>Get Abyss</h2>
         <p>Grab the latest Windows build — an installer or a portable zip, whichever you prefer.</p>
         <div class="cta">
-          <a class="btn lure" href="https://github.com/ClemFandango016outlookcom/Abyss/releases/latest">▼ Download latest release</a>
-          <a class="btn aqua sm" href="https://github.com/ClemFandango016outlookcom/Abyss">Source code</a>
+          <a class="btn lure" data-dl-exe href="https://github.com/ClemFandango016outlookcom/Abyss/releases/latest">
+            ▼ Download for Windows
+            <span data-dl-tag style="font-family: var(--font-mono); font-size: 12px; opacity: 0.85"></span>
+          </a>
+          <a class="btn aqua sm" data-dl-zip href="https://github.com/ClemFandango016outlookcom/Abyss/releases/latest">Portable .zip</a>
         </div>
         <p class="smol">
           The build isn't code-signed yet, so Windows SmartScreen may warn you — click “More info”
@@ -284,5 +288,40 @@
         Studios; you need to own a copy to play.
       </p>
     </footer>
+
+    <script>
+      // Point the download buttons at the latest release's actual assets.
+      // Falls back to the releases page (the buttons' default href) if this fails.
+      (async () => {
+        try {
+          const res = await fetch(
+            'https://api.github.com/repos/ClemFandango016outlookcom/Abyss/releases/latest',
+            { headers: { Accept: 'application/vnd.github+json' } }
+          )
+          if (!res.ok) return
+          const rel = await res.json()
+          const assets = rel.assets || []
+          const exe = assets.find((a) => a.name.endsWith('-setup.exe'))
+          const zip = assets.find((a) => a.name.endsWith('.zip'))
+          if (exe) {
+            document.querySelectorAll('[data-dl-exe]').forEach((a) => {
+              a.href = exe.browser_download_url
+            })
+          }
+          if (zip) {
+            document.querySelectorAll('[data-dl-zip]').forEach((a) => {
+              a.href = zip.browser_download_url
+            })
+          }
+          if (rel.tag_name) {
+            document.querySelectorAll('[data-dl-tag]').forEach((el) => {
+              el.textContent = rel.tag_name
+            })
+          }
+        } catch (e) {
+          /* keep the fallback hrefs */
+        }
+      })()
+    </script>
   </body>
 </html>
