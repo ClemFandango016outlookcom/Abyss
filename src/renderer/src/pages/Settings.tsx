@@ -46,9 +46,7 @@ export function SettingsPage(): JSX.Element | null {
   return (
     <div>
       <div className="page-head">
-        <div className="eyebrow">Configuration</div>
         <h1>Settings</h1>
-        <p>Accounts, memory and game options.</p>
       </div>
 
       {/* Accounts */}
