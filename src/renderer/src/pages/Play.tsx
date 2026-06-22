@@ -37,9 +37,8 @@ export function Play(): JSX.Element {
     <div>
       <div className="page-head row" style={{ justifyContent: 'space-between' }}>
         <div>
-          <div className="eyebrow">Launcher</div>
           <h1>Play</h1>
-          <p>Launch, manage and mod your Minecraft instances.</p>
+          <p>Your Minecraft instances.</p>
         </div>
         <button className="btn primary" onClick={() => setShowCreate(true)}>
           <Plus size={16} /> New instance

@@ -49,9 +49,8 @@ export function Browse(): JSX.Element {
   return (
     <div>
       <div className="page-head">
-        <div className="eyebrow">Modrinth</div>
-        <h1>Browse Mods</h1>
-        <p>Search {compactNumber(total)} projects and install them into any instance.</p>
+        <h1>Browse</h1>
+        <p>{compactNumber(total)} projects on Modrinth.</p>
       </div>
 
       <div className="toolbar">

@@ -47,12 +47,7 @@ export default function App(): JSX.Element {
               </Routes>
             ) : (
               <div className="loading">
-                <div className="sonar">
-                  <span />
-                  <span />
-                  <span />
-                </div>
-                <span>Descending into the Abyss…</span>
+                <span className="spinner" />
               </div>
             )}
           </main>
